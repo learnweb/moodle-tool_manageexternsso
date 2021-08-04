@@ -17,6 +17,7 @@
 $string['pluginname'] = 'Manage external SSOs';
 
 $string['addsso'] = 'Add external SSO';
+$string['addssogroup'] = 'Add external SSO group';
 $string['externusername'] = 'External username';
 $string['noneselected'] = 'None selected';
 $string['until'] = 'Until';
@@ -27,3 +28,4 @@ $string['tools'] = 'Tools';
 $string['overview'] = 'Edit external SSOs';
 $string['configfile'] = 'Config file';
 $string['delete_expired_ssos'] = 'Delete expired external SSOs';
+$string['usergroup'] = 'Usergroup';

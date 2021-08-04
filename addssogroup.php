@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Add Extern SSOs Overview Page.
+ * Add Extern SSOs group Overview Page.
  *
  * @package    tool_manageexternsso
  * @copyright  2021 Justus Dieckmann WWU
@@ -31,11 +31,11 @@ require_once($CFG->libdir . '/adminlib.php');
 
 $ssoentryid = optional_param('ssoentryid', null, PARAM_INT);
 
-$PAGE->set_url(new moodle_url('/admin/tool/manageexternsso/addsso.php'));
+$PAGE->set_url(new moodle_url('/admin/tool/manageexternsso/addssogroup.php'));
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('admin');
 
-$strheading = get_string('addsso', 'tool_manageexternsso');
+$strheading = get_string('addssogroup', 'tool_manageexternsso');
 $PAGE->set_title($strheading);
 $PAGE->set_heading($strheading);
 
@@ -43,23 +43,20 @@ require_admin();
 
 $ssoentry = null;
 if ($ssoentryid !== null) {
-    $ssoentry = sso_manager::get_sso_by_id($ssoentryid);
+    $ssoentry = sso_manager::get_ssogroup_by_id($ssoentryid);
 }
 
-$mform = new tool_manageexternsso\sso_mform($ssoentry);
+$mform = new tool_manageexternsso\ssogroup_mform($ssoentry);
 
 if ($mform->is_cancelled()) {
     redirect(new moodle_url('/admin/tool/manageexternsso/managesso.php'));
 }
 
 if ($data = $mform->get_data()) {
-    if (property_exists($data, 'infinite')) {
-        $data->until = null;
-    }
     if (property_exists($data, 'ssoentryid')) {
-        sso_manager::update_sso($data->username_extern, $data->contactuser, $data->until);
+        sso_manager::update_ssogroup($data->usergroup_extern, $data->description);
     } else {
-        sso_manager::add_sso($data->username_extern, $data->contactuser, $data->until);
+        sso_manager::add_ssogroup($data->usergroup_extern, $data->description);
     }
 
     redirect(new moodle_url('/admin/tool/manageexternsso/managesso.php'));

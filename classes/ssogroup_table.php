@@ -37,7 +37,7 @@ require_once($CFG->libdir . '/tablelib.php');
  * @copyright  2021 Justus Dieckmann WWU
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class sso_table extends \table_sql {
+class ssogroup_table extends \table_sql {
 
     /**
      * sso_table constructor.
@@ -48,46 +48,20 @@ class sso_table extends \table_sql {
     public function __construct() {
         parent::__construct('tool_manageexternsso_overview');
         global $PAGE;
-        $fields = "sso.id, sso.username_extern as username, sso.userid_contact as contact, sso.until ";
-        $fields .= \core_user\fields::for_name()->get_sql('cu', false, '')->selects;
 
-        $from = '{tool_manageexternsso} sso ' .
-            'JOIN {user} cu ON cu.id = sso.userid_contact';
-
-        $this->set_sql($fields, $from, 'true');
+        $this->set_sql('id, usergroup_extern as usergroup, description', '{tool_manageexternsso_g}', 'true');
 
         $this->define_baseurl(new moodle_url($PAGE->url));
         $this->pageable(false);
 
-        $this->define_columns(['username', 'contact', 'until', 'tools']);
+        $this->define_columns(['usergroup', 'description', 'tools']);
         $this->define_headers([
-            get_string('externusername', 'tool_manageexternsso'),
-            get_string('contact', 'tool_manageexternsso'),
-            get_string('until', 'tool_manageexternsso'),
+            get_string('usergroup', 'tool_manageexternsso'),
+            get_string('description'),
             get_string('tools', 'tool_manageexternsso')
         ]);
 
         $this->setup();
-    }
-
-    /**
-     * Output for column contact
-     * @param \stdClass $col column
-     */
-    public function col_contact(\stdClass $col) {
-        return \html_writer::link(new moodle_url('/user/profile.php', ['id' => $col->contact]), fullname($col));
-    }
-
-    /**
-     * Output for column until
-     * @param \stdClass $col column
-     */
-    public function col_until(\stdClass $col) {
-        if ($col->until === null) {
-            return get_string('infinite', 'tool_manageexternsso');
-        } else {
-            return userdate($col->until);
-        }
     }
 
     /**
@@ -98,13 +72,13 @@ class sso_table extends \table_sql {
         global $OUTPUT, $PAGE;
         $delete = get_string('delete');
         $edit = get_string('edit');
-        return $OUTPUT->action_icon(new \moodle_url('/admin/tool/manageexternsso/addsso.php',
+        return $OUTPUT->action_icon(new \moodle_url('/admin/tool/manageexternsso/addssogroup.php',
                 array('ssoentryid' => $col->id)),
                 new \pix_icon('i/edit', $edit, 'moodle', array('title' => $edit)),
                 null, array('title' => $edit)) .
             $OUTPUT->action_icon(new \moodle_url($PAGE->url,
                 array('action' => 'delete',
-                    'group' => false,
+                    'group' => true,
                     'sesskey' => sesskey(),
                     'ssoentryid' => $col->id)),
                 new \pix_icon('i/delete', $delete, 'moodle', array('title' => $delete)),

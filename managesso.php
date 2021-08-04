@@ -41,18 +41,34 @@ $action = optional_param('action', null, PARAM_ALPHA);
 if ($action === 'delete') {
     require_sesskey();
     $ssoentryid = required_param('ssoentryid', PARAM_INT);
-    \tool_manageexternsso\sso_manager::delete_sso_by_id($ssoentryid);
+    $isgroup = required_param('group', PARAM_BOOL);
+    if ($isgroup) {
+        \tool_manageexternsso\sso_manager::delete_ssogroup_by_id($ssoentryid);
+    } else {
+        \tool_manageexternsso\sso_manager::delete_sso_by_id($ssoentryid);
+    }
+
     redirect($PAGE->url);
 }
-$table = new tool_manageexternsso\sso_table();
+$usertable = new tool_manageexternsso\sso_table();
+$grouptable = new tool_manageexternsso\ssogroup_table();
 
 echo $OUTPUT->header();
-
-echo $OUTPUT->single_button(new moodle_url('/admin/tool/manageexternsso/addsso.php'), get_string('addsso', 'tool_manageexternsso', 'get'));
+echo $OUTPUT->heading(get_string('users'));
+echo $OUTPUT->single_button(new moodle_url('/admin/tool/manageexternsso/addsso.php'), get_string('addsso', 'tool_manageexternsso'), 'get');
 
 echo "<br><br>";
 
-$table->out(128, false);
+$usertable->out(128, false);
+
+echo "<br><br>";
+echo $OUTPUT->heading(get_string('groups'));
+
+echo $OUTPUT->single_button(new moodle_url('/admin/tool/manageexternsso/addssogroup.php'), get_string('addssogroup', 'tool_manageexternsso'), 'get');
+
+echo "<br><br>";
+
+$grouptable->out(128, false);
 
 echo $OUTPUT->footer();
 

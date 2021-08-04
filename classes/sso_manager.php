@@ -94,16 +94,73 @@ class sso_manager {
     }
 
     /**
+     * Add new external SSO entry.
+     * @param string $groupname the (new) external groupname
+     * @param string|null $description description for the group.
+     */
+    public static function add_ssogroup(string $groupname, ?string $description) {
+        global $DB;
+
+        $ssoentry = new \stdClass();
+        $ssoentry->usergroup_extern = $groupname;
+        $ssoentry->description = $description;
+
+        $DB->insert_record('tool_manageexternsso_g', $ssoentry);
+        self::update_configfile();
+    }
+
+    /**
+     * Update existing external SSO entry.
+     * @param string $groupname the (new) external groupname
+     * @param string|null $description description for the group.
+     */
+    public static function update_ssogroup(string $groupname, ?string $description) {
+        global $DB;
+
+        $record = $DB->get_record('tool_manageexternsso_g', ['usergroup_extern' => $groupname]);
+        if ($record == false) {
+            throw new \coding_exception('Could not find specified external group in Database!');
+        }
+
+        $record->description = $description;
+
+        $DB->update_record('tool_manageexternsso_g', $record);
+    }
+
+
+    /**
+     * Delete external SSO group entry by recordid.
+     * @param int $ssoentryid the record id.
+     */
+    public static function delete_ssogroup_by_id(int $ssoentryid) {
+        global $DB;
+        $DB->delete_records('tool_manageexternsso_g', ['id' => $ssoentryid]);
+        self::update_configfile();
+    }
+
+    /**
+     * Return external SSO group entry by recordid.
+     * @param int $ssoentryid the record id.
+     */
+    public static function get_ssogroup_by_id(int $ssoentryid) {
+        global $DB;
+        return $DB->get_record('tool_manageexternsso_g', ['id' => $ssoentryid]);
+    }
+
+    /**
      * Updates the config file to match the database.
      */
     public static function update_configfile() {
         global $DB, $CFG;
 
         // Using postgres.
-        $users = $DB->get_field_sql("SELECT string_agg(username_extern, ' ' ORDER BY username_extern ASC) " .
-            "FROM {tool_manageexternsso} " .
-            "WHERE until IS NULL OR until > :time",
-            ['time' => time()]);
+        $ssos = $DB->get_field_sql("SELECT string_agg(usergroup_extern, ' ' ORDER BY usergroup_extern ASC) " .
+                "FROM {tool_manageexternsso_g} ");
+        $ssos .= ' ';
+        $ssos .= $DB->get_field_sql("SELECT string_agg(username_extern, ' ' ORDER BY username_extern ASC) " .
+                "FROM {tool_manageexternsso} " .
+                "WHERE until IS NULL OR until > :time",
+                ['time' => time()]);
 
         $filepath = get_config('tool_manageexternsso', 'configfile');
 
@@ -125,7 +182,7 @@ class sso_manager {
         $olduserstart = $matches['users'][1];
 
         $newcontent = substr($content, 0, $olduserstart) .
-            $users .
+            $ssos .
             substr($content, $olduserstart + $olduserslength);
 
         file_put_contents($CFG->dirroot . '/.htssoaccess', $newcontent);
