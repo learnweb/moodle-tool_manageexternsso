@@ -62,7 +62,6 @@ class sso_mform extends \moodleform {
 
         $mform->addElement('text', 'username_extern', get_string('username'));
         $mform->setType('username_extern', PARAM_TEXT);
-        $mform->addRule('username_extern', get_string('required'), 'required');
 
         $options = [
             'ajax' => 'core_search/form-search-user-selector',
@@ -98,6 +97,7 @@ class sso_mform extends \moodleform {
             }
             $mform->freeze(['username_extern']);
         } else {
+            $mform->addRule('username_extern', get_string('required'), 'required');
             $mform->setDefault('until', time() + 60 * 60 * 24 * 182);
         }
 
