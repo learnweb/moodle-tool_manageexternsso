@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="admin/tool/manageexternsso/db" VERSION="20210803" COMMENT="XMLDB file for Moodle admin/tool/manageexternsso"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="tool_manageexternsso" COMMENT="Stores all extern sso entries">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="username_extern" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid_contact" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false" COMMENT="User to contact about this external SSO entry"/>
+        <FIELD NAME="until" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false" COMMENT="Timestamp when this entry should be deleted. null means infinite."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="username_extern_ukey" TYPE="unique" FIELDS="username_extern"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
